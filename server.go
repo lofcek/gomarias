@@ -10,68 +10,6 @@ import (
 
 var DEBUG = true
 
-type Basic struct {
-	Name string
-}
-
-type Player struct {
-	Name string
-	Club string	 `json:",omitempty`
-}
-
-type Players map[int] Player
-
-type Tournament struct {
-	Basic Basic
-	Players Players
-}
-
-/*type Page struct {
-	Title string
-	Body  []byte
-}
-
-func (p *Page) save() error {
-	filename := p.Title + ".txt"
-	return ioutil.WriteFile(filename, p.Body, 0600)
-}
-
-func loadPage(title string) (*Page, error) {
-	filename := title + ".txt"
-	body, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	return &Page{Title: title, Body: body}, nil
-}
-
-func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
-	p, err := loadPage(title)
-	if err != nil {
-		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
-		return
-	}
-	renderTemplate(w, "view", p)
-}
-
-func editHandler(w http.ResponseWriter, r *http.Request, title string) {
-	p, err := loadPage(title)
-	if err != nil {
-		p = &Page{Title: title}
-	}
-	renderTemplate(w, "edit", p)
-}
-
-func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
-	body := r.FormValue("body")
-	p := &Page{Title: title, Body: []byte(body)}
-	err := p.save()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	http.Redirect(w, r, "/view/"+title, http.StatusFound)
-}*/
 
 func playersEditHandler(w http.ResponseWriter, r *http.Request, t *Tournament) {
 	renderTemplate(w, "players-edit.html", t)
@@ -89,7 +27,7 @@ func getTemplates() *template.Template {
 	return templates
 }
 
-func renderTemplate(w http.ResponseWriter, tmpl string, t *Tournament) {
+func renderTemplate(w http.ResponseWriter, tmpl string, t interface{}) {
 	fmt.Printf("%#v\n", getTemplates().Name())
 	err := getTemplates().ExecuteTemplate(w, tmpl, t)
 	if err != nil {
@@ -97,7 +35,6 @@ func renderTemplate(w http.ResponseWriter, tmpl string, t *Tournament) {
 	}
 }
 
-var validPath = regexp.MustCompile("^/players-edit/$")
 var tour = Tournament{
 			Basic: Basic{Name:"Chropov 2015"},
 			Players: Players {
@@ -107,6 +44,8 @@ var tour = Tournament{
 			},
 		}
 
+var validPath = regexp.MustCompile("^/players-edit/([A-Za-z0-9_ ]+)$")
+
 func makeHandler(fn func(http.ResponseWriter, *http.Request, *Tournament)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 	    //fmt.Println(r.URL.Path)
@@ -114,13 +53,20 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, *Tournament)) http.
 			http.NotFound(w, r)
 			return
 		}
-		fmt.Printf("%#v\n", r.Form)
 		m := validPath.FindStringSubmatch(r.URL.Path)
+		tour,err := load_tournament(m[1])
+		if err != nil {
+			renderTemplate(w, "error-page.html", map[string]string{
+				"Error": err.Error(),
+				"Tournament": m[1],
+			})
+		}
+
 		if m == nil {
 			http.NotFound(w, r)
 			return
 		}
-		fn(w, r, &tour)
+		fn(w, r, tour)
 	}
 }
 
@@ -130,4 +76,3 @@ func main() {
 
 	http.ListenAndServe(":2080", nil)
 }
-
