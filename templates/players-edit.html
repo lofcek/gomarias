@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Súpiska</title>
+<style>
+#players {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+#players th, td {
+    padding: 15px;
+}
+#players tr:nth-child(odd) {
+    background-color: #eee;
+}
+#players tr:nth-child(even){
+   background-color:#fff;
+}
+#players th	{
+    background-color: black;
+    color: white;
+    text-align: left;
+}
+#players th.player_id {
+    text-align: right;
+    width:10%
+}
+
+#players th.club {
+    width:30%
+}
+#players input {
+   width: 100%;
+   text-align:left;
+   border:1px solid;
+   background:transparent
+}
+#players input:not(:focus) {
+   border:0px solid;
+ }
+</style>
+</head>
+
+<body>
+<form action="" method="post">
+  <table id="players">
+  <tr class="header">
+    <th class="player_id">Číslo</th>
+    <th class="player_name">Meno hráča</th>		
+    <th class="club">Klub</th>
+  </tr>
+  {{range $id,$player := .Players}}
+  <tr>
+	  <td>{{$id}}.</td>
+	  <td><input type="text" name="name[]" value="{{$player.Name}}"/></td>		
+	  <td><input type="text" name="club[]" value="{{$player.Club}}"/></td>		
+  </tr>
+  {{end}}
+</table>
+
+<br/>
+<input type="submit" name="submit" value="Uložiť"/>
+</form>
+</body>
+</html>
+
