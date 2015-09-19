@@ -3,12 +3,12 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>{{.Tournament}} - Súpiska</title>
+	<title>{{.Tournament}} - {{gettext "Súpiska"}}</title>
 </head>
 
 
 <body>
-<h1>Chyba pri spracovaní turnaja &quot{{.Tournament}}&quot</h1>
+<h1>{{printf (gettext "Chyba pri spracovaní turnaja <%s>") .Tournament }}</h1>
 
 <div>{{.Error}}<div>
 </body>

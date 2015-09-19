@@ -39,7 +39,11 @@
 }
 #players input:not(:focus) {
    border:0px solid;
- }
+}
+
+#players td:first-child {
+   text-align:right;
+}
 </style>
 </head>
 
@@ -47,9 +51,9 @@
 <form action="" method="post">
   <table id="players">
   <tr class="header">
-    <th class="player_id">Číslo</th>
-    <th class="player_name">Meno hráča</th>		
-    <th class="club">Klub</th>
+	  <th class="player_id">{{gettext "Číslo"}}</th>
+	  <th class="player_name">{{gettext "Meno hráča"}}</th>		
+	  <th class="club">{{gettext "Klub"}}</th>
   </tr>
   {{range $id,$player := .Players}}
   <tr>
@@ -61,7 +65,7 @@
 </table>
 
 <br/>
-<input type="submit" name="submit" value="Uložiť"/>
+<input type="submit" name="submit" value="{{gettext "Uložiť"}}"/>
 </form>
 </body>
 </html>
