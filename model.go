@@ -105,3 +105,7 @@ func getTournaments() ([]*Tournament, error) {
 	}
 	return result, nil
 }
+
+func not_allowed_in_name() string {
+	return `."/\:'`;
+}

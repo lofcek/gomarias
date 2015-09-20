@@ -13,7 +13,7 @@
 
 <form action="">
 	<input type="radio" name="action" value="open_existing" checked onchange="showComboLoaded();" id="radio_load">{{gettext "Otvoriť existujúci turnaj"}}<br/>
-	&nbsp;&nbsp;&nbsp;
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<select id="comboLoaded">
 		 {{range .}}
 		 	{{with .Basic.FileName}}
@@ -22,16 +22,26 @@
 		 {{end}}
 	</select>
 	<br/>
-	<input type="radio" name="action" value="open_new" onchange="showComboLoaded();">{{gettext "Vytvoriť nový turnaj"}}<br>
+	<br/>
+	<input type="radio" name="action" value="open_new" onchange="showComboLoaded();"/>{{gettext "Vytvoriť nový turnaj"}}<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{gettext "Miesto a dátum konania"}}<br/>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="place_and_date" type="text" name="place_and_date" value="" pattern="[^{{double_backslash not_allowed_in_name}}]*" title="{{printf (gettext "text nesmie obsahovať nasledujúce znaky: %s") not_allowed_in_name}}"/><br/>
+	
+	<br/>
+	<input type="submit" name="submit" value="{{gettext "OK"}}"/>
 </form>
 
 <script>
 function showComboLoaded() {
 	var val = !document.getElementById("radio_load").checked;
-	var combo = document.getElementById("comboLoaded");
-	if (combo) {
-		combo.disabled = val;
+	var comboLoaded = document.getElementById("comboLoaded");
+	if (comboLoaded) {
+		comboLoaded.disabled = val;
 	}
+	var place_and_date= document.getElementById("place_and_date");
+	console.log(place_and_date);
+	if (place_and_date)
+		 place_and_date.disabled = !val;
 }
 </script>
 </body>

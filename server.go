@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"encoding/json"
+	"strings"
 )
 
 var DEBUG = true
@@ -62,9 +63,15 @@ func playersEditHandler(w http.ResponseWriter, r *http.Request, t *Tournament) {
 	renderTemplate(w, "players-edit.html", t)
 }
 
+func double_backslash(s string) string {
+	return strings.Replace(s, `\`, `\\`, -1)
+}
+
 func getTemplatesInit() *template.Template {
 	funcMap := template.FuncMap{
 		"gettext": gettext,
+		"not_allowed_in_name": not_allowed_in_name,
+		"double_backslash": double_backslash,
 	}
 	return template.Must(template.New("main").Funcs(funcMap).ParseGlob("templates/*.html"))
 }
