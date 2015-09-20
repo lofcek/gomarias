@@ -16,14 +16,27 @@ func gettext(s string) string {
 	return s
 }
 
+func tournamentSelectHandler(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	tour,err := getTournaments()
+	if err != nil {
+		renderError(w, err, "")
+		return
+	}
+	renderTemplate(w, "tournament-select.html", tour)
+}
+
 func playersEditHandler(w http.ResponseWriter, r *http.Request, t *Tournament) {
 	if r.FormValue("submit") != "" {
 		// User send a request, we should override a data
 		var players Players= make(Players)
 		var names, clubs []string
 		var ok bool
-		if names,ok = r.Form["name[]"]; !ok {renderError(w, fmt.Errorf("No names in page"), t.Basic.Name); return}
-		if clubs,ok = r.Form["club[]"]; !ok {renderError(w, fmt.Errorf("No clubs in page"), t.Basic.Name); return}
+		if names,ok = r.Form["name[]"]; !ok {renderError(w, fmt.Errorf("No names in page"), t.Basic.FileName); return}
+		if clubs,ok = r.Form["club[]"]; !ok {renderError(w, fmt.Errorf("No clubs in page"), t.Basic.FileName); return}
 		if len(names) != len(clubs) {
 			log.Panicf("names and clus has different lenght - %d, %d", len(names), len(clubs))
 		}
@@ -41,7 +54,7 @@ func playersEditHandler(w http.ResponseWriter, r *http.Request, t *Tournament) {
 		//t.Players = players
 		b,err := json.MarshalIndent(t, "", " ")
 		if err != nil {
-			renderError(w, err, t.Basic.Name)
+			renderError(w, err, t.Basic.LongName)
 			return
 		}
 		fmt.Println("b = ", string(b))
@@ -50,7 +63,9 @@ func playersEditHandler(w http.ResponseWriter, r *http.Request, t *Tournament) {
 }
 
 func getTemplatesInit() *template.Template {
-	funcMap := template.FuncMap{"gettext": gettext}
+	funcMap := template.FuncMap{
+		"gettext": gettext,
+	}
 	return template.Must(template.New("main").Funcs(funcMap).ParseGlob("templates/*.html"))
 }
 var templates = getTemplatesInit()
@@ -76,7 +91,7 @@ func renderError(w http.ResponseWriter, err error, tournament string) {
 		"Tournament": tournament,
 	})
 }
-var tour = Tournament{}
+//var tour = Tournament{}
 
 var validPath = regexp.MustCompile("^/players-edit/([A-Za-z0-9_ ]+)$")
 
@@ -105,5 +120,6 @@ func makeHandler(fn func(http.ResponseWriter, *http.Request, *Tournament)) http.
 func main() {
 	//fmt.Printf("%#v\n", tour)
 	http.HandleFunc("/players-edit/", makeHandler(playersEditHandler))
+	http.HandleFunc("/", tournamentSelectHandler)
 	http.ListenAndServe(":2080", nil)
 }

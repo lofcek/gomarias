@@ -7,10 +7,15 @@ import (
 	"os"
 	"strconv"
 	"bytes"
+	"io/ioutil"
+	"strings"
 )
 
 type Basic struct {
-	Name string
+	FileName string
+	LongName string
+	PlaceAndDate string
+	AmountPerRound float64
 }
 
 type Player struct {
@@ -30,10 +35,11 @@ func load_tournament(filename string) (*Tournament,error) {
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 	reader := bufio.NewReader(f)
 	decoder := json.NewDecoder(reader)
 	var t Tournament = Tournament{
-		Basic: Basic{Name: filename},
+		Basic: Basic{FileName: filename},
 		Players: make(Players),
 	}
 	if err := decoder.Decode(&t); err != nil {
@@ -80,4 +86,22 @@ func (self Players)MarshalJSON() ([]byte, error) {
 	}
 	b.WriteRune('}')
 	return b.Bytes(), nil
+}
+
+func getTournaments() ([]*Tournament, error) {
+	result := make([]*Tournament, 0)
+	fileinfos, err := ioutil.ReadDir("data")
+	if err!=nil {
+		return nil, err
+	}
+	for _,f := range fileinfos {
+		filename:=f.Name()
+		if (f.Mode()&os.ModeType==0) && strings.HasSuffix(filename, ".json") {
+			t,err := load_tournament(filename[:len(filename)-len(".json")])
+			if err==nil {
+				result=append(result, t)
+			}
+		}
+	}
+	return result, nil
 }

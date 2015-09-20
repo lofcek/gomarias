@@ -3,7 +3,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>{{.Tournament}} - {{gettext "Súpiska"}}</title>
+	<title>{{with .Tournament}}{{.Tournament}}{{else}}{{gettext "Mariáš"}}{{end}}</title>
 </head>
 
 

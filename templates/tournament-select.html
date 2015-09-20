@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>{{gettext "Výber turnaja"}}</title>
+</head>
+
+<body onload="showComboLoaded()">
+<h1>{{gettext "Hlavná stránka"}} - {{gettext "Výber turnaja"}}</h1>
+
+
+
+<form action="">
+	<input type="radio" name="action" value="open_existing" checked onchange="showComboLoaded();" id="radio_load">{{gettext "Otvoriť existujúci turnaj"}}<br/>
+	&nbsp;&nbsp;&nbsp;
+	<select id="comboLoaded">
+		 {{range .}}
+		 	{{with .Basic.FileName}}
+		 		<option value="{{.}}">{{.}}</option>
+			{{end}}
+		 {{end}}
+	</select>
+	<br/>
+	<input type="radio" name="action" value="open_new" onchange="showComboLoaded();">{{gettext "Vytvoriť nový turnaj"}}<br>
+</form>
+
+<script>
+function showComboLoaded() {
+	var val = !document.getElementById("radio_load").checked;
+	var combo = document.getElementById("comboLoaded");
+	if (combo) {
+		combo.disabled = val;
+	}
+}
+</script>
+</body>
