@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>{{gettext "Výber turnaja"}}</title>
+</head>
+
+<body>
+<h1>{{printf (gettext "Nastavenie turnaja %s") .Basic.FileName}}</h1>
+<form action="" method="post">
+	{{with .Basic}}
+	{{gettext "Oficiálny názov turnaja"}}<br/>
+	<input type="text" name="LongName" value="{{.LongName}}" />
+	<br/><br/>
+	{{gettext "Vklad hráča na jedno kolo"}}<br/>
+	<input type="number" step="any" name="AmountPerRound" min="0" value="{{or .AmountPerRound 12}}" />
+	<br/><br/>
+	{{gettext "Mena"}}<br/>
+	<input type="text" name="Currency" value="{{or .Currency "€"}}" />
+	<br/><br/>
+	{{gettext "Počet kôl"}}<br/>
+	<input type="text" name="Currency" value="{{or (len .Rounds) 5}}" />
+	<br/><br/>
+
+	{{range $n,$r := .Rounds}}
+	{{printf (gettext "Rozlovanie %d. kola") (plus $n 1)}}<br/>
+	<select name="Rounds{{$n}}">
+		<option value="Fixed" {{if eq $r "Fixed"}}selected{{end}}>{{gettext "Pevné"}}</option>
+		<option value="BestTogether" {{if eq $r "BestTogether"}}selected{{end}}>{{gettext "Švajčiarsky systém"}}</option>
+	</select><br/>
+	<br/>
+	{{end}}
+
+	{{end}}
+	<input type="submit" name="submit" value="{{gettext "Potvrdiť"}}"/>
+</form>
+</body>

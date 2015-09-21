@@ -9,6 +9,7 @@ import (
 	"log"
 	"encoding/json"
 	"strings"
+	"os"
 )
 
 var DEBUG = true
@@ -21,6 +22,40 @@ func tournamentSelectHandler(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
 		http.NotFound(w, r)
 		return
+	}
+	if r.FormValue("submit") != "" {
+		var t *Tournament
+		var err error
+		var name string
+		var open_new = (r.FormValue("action") == "open_new")
+		if open_new {
+			name = r.FormValue("place_and_date")
+		} else {
+			name = r.FormValue("name")
+		}
+		if strings.Contains(name, not_allowed_in_name()) {
+			renderError(w, fmt.Errorf(gettext("Nedovolené znaky v mene súboru")), "")
+			return
+		}
+		t, err = load_tournament("name")
+		if !open_new {
+			if err != nil {
+				renderError(w, err, name)
+				return
+			}
+		} else {
+			if err == nil {
+				renderError(w, fmt.Errorf(gettext("Turnaj s týmto menom už existuje")), name)
+				return
+			} else if !os.IsNotExist(err) {
+				renderError(w, err, name)
+			}
+			t = NewTournament(name)
+			t.Basic.FileName = name
+		}
+		renderTemplate(w, "tournament-edit.html", t)
+		return
+
 	}
 	tour,err := getTournaments()
 	if err != nil {
@@ -72,6 +107,7 @@ func getTemplatesInit() *template.Template {
 		"gettext": gettext,
 		"not_allowed_in_name": not_allowed_in_name,
 		"double_backslash": double_backslash,
+		"plus": func (a,b int) int {return a+b},
 	}
 	return template.Must(template.New("main").Funcs(funcMap).ParseGlob("templates/*.html"))
 }

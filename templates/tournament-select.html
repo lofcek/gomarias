@@ -11,7 +11,7 @@
 
 
 
-<form action="">
+<form action="" method="post">
 	<input type="radio" name="action" value="open_existing" checked onchange="showComboLoaded();" id="radio_load">{{gettext "Otvoriť existujúci turnaj"}}<br/>
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<select id="comboLoaded">
@@ -28,7 +28,7 @@
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id="place_and_date" type="text" name="place_and_date" value="" pattern="[^{{double_backslash not_allowed_in_name}}]*" title="{{printf (gettext "text nesmie obsahovať nasledujúce znaky: %s") not_allowed_in_name}}"/><br/>
 	
 	<br/>
-	<input type="submit" name="submit" value="{{gettext "OK"}}"/>
+	<input type="submit" name="submit" value="{{gettext "Potvrdiť"}}"/>
 </form>
 
 <script>

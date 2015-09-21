@@ -11,11 +11,19 @@ import (
 	"strings"
 )
 
+type RoundType string
+
+const (
+	RoundTypeFixed        RoundType = "Fixed"
+	RoundTypeBestTogether RoundType = "BestTogether"
+)
+
 type Basic struct {
 	FileName string
 	LongName string
-	PlaceAndDate string
 	AmountPerRound float64
+	Currency string
+	Rounds []RoundType
 }
 
 type Player struct {
@@ -31,6 +39,9 @@ type Tournament struct {
 }
 
 func load_tournament(filename string) (*Tournament,error) {
+	if strings.Contains(filename, not_allowed_in_name()) {
+		return nil, fmt.Errorf(gettext("Nedovolené znaky v názve turnaja"))
+	}
 	f, err := os.Open("data/" + filename + ".json")
 	if err != nil {
 		return nil, err
@@ -38,14 +49,23 @@ func load_tournament(filename string) (*Tournament,error) {
 	defer f.Close()
 	reader := bufio.NewReader(f)
 	decoder := json.NewDecoder(reader)
-	var t Tournament = Tournament{
-		Basic: Basic{FileName: filename},
-		Players: make(Players),
-	}
-	if err := decoder.Decode(&t); err != nil {
+	var t *Tournament = NewTournament(filename)
+	if err := decoder.Decode(t); err != nil {
 		return nil, err
 	}
-	return  &t, nil
+	return  t, nil
+}
+
+func NewTournament(filename string) *Tournament {
+	var t Tournament = Tournament{
+		Basic: Basic{
+			FileName: filename,
+			Rounds: []RoundType {RoundTypeFixed, RoundTypeFixed, RoundTypeFixed, RoundTypeBestTogether, RoundTypeBestTogether},
+
+		},
+		Players: make(Players),
+	}
+	return &t
 }
 
 func (players *Players)UnmarshalJSON(b []byte) error {
